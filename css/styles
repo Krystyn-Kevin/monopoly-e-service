@@ -1,0 +1,970 @@
+/* css/styles.css
+   Design language: a banker's ledger crossed with Monopoly deed cards.
+   Tokens below are the single source of truth for color & type — every
+   component derives from these instead of hardcoding values.
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap");
+
+:root {
+  /* ---- Light theme (default) ---- */
+  --color-paper: #f3edde;
+  --color-paper-soft: #faf6ec;
+  --color-paper-raised: #ffffff;
+  --color-ink: #1c2b28;
+  --color-ink-soft: #51635c;
+  --color-bank-green: #0b6e4f;
+  --color-bank-green-dark: #084f39;
+  --color-gold: #b8861f;
+  --color-gold-soft: #e9d8a8;
+  --color-brick: #a73327;
+  --color-brick-soft: #f3d9d3;
+  --color-rail: #3b4a6b;
+  --color-border: #d8cba0;
+  --shadow-card: 0 1px 2px rgba(28, 43, 40, 0.06), 0 6px 16px rgba(28, 43, 40, 0.07);
+
+  --group-brown: #8a5634;
+  --group-lightblue: #a8def0;
+  --group-pink: #d93a96;
+  --group-orange: #f7941d;
+  --group-red: #ed1b24;
+  --group-yellow: #f4d100;
+  --group-green: #1fb25a;
+  --group-darkblue: #0072bb;
+  --group-railroad: #2b2b2b;
+  --group-utility: #9a9a9a;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}
+
+[data-theme="dark"] {
+  --color-paper: #141d1a;
+  --color-paper-soft: #1b2622;
+  --color-paper-raised: #1f2b26;
+  --color-ink: #ede6d2;
+  --color-ink-soft: #aab6ad;
+  --color-bank-green: #34b07e;
+  --color-bank-green-dark: #2b8f67;
+  --color-gold: #d9b753;
+  --color-gold-soft: #4a4023;
+  --color-brick: #e07165;
+  --color-brick-soft: #3c2422;
+  --color-rail: #8da0c9;
+  --color-border: #364039;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; margin: 0 0 0.4em; letter-spacing: -0.01em; }
+p { margin: 0 0 0.75em; color: var(--color-ink-soft); line-height: 1.5; }
+button { font-family: inherit; }
+a { color: var(--color-bank-green); }
+:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
+.muted { color: var(--color-ink-soft); font-size: 0.9rem; }
+
+/* ---------------- App shell ---------------- */
+#app {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px;
+  background: var(--color-paper-raised);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+.brand-mark {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  background: linear-gradient(155deg, var(--color-bank-green), var(--color-bank-green-dark));
+  display: grid; place-items: center;
+  color: var(--color-gold-soft);
+  font-family: var(--font-display);
+  font-weight: 700;
+  box-shadow: var(--shadow-card);
+}
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+
+.theme-toggle {
+  border: 1px solid var(--color-border);
+  background: var(--color-paper-soft);
+  color: var(--color-ink);
+  border-radius: 999px;
+  width: 38px; height: 38px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.user-chip {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.88rem;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-paper-soft);
+}
+.user-chip button {
+  border: none; background: none; color: var(--color-brick);
+  cursor: pointer; font-weight: 600; font-size: 0.82rem;
+}
+
+main#screens { flex: 1; padding: 24px; max-width: 1180px; margin: 0 auto; width: 100%; }
+
+.screen { display: none; animation: fadeIn 0.25s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: none; } }
+
+/* ---------------- Buttons & forms ---------------- */
+.btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-bank-green);
+  background: var(--color-bank-green);
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+.btn:hover { box-shadow: 0 4px 14px rgba(11, 110, 79, 0.28); transform: translateY(-1px); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-outline { background: transparent; color: var(--color-bank-green); }
+.btn-ghost { background: transparent; color: var(--color-ink); border-color: var(--color-border); }
+.btn-danger { background: var(--color-brick); border-color: var(--color-brick); }
+.btn-gold { background: var(--color-gold); border-color: var(--color-gold); color: #2b2208; }
+.btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+.btn-xs { padding: 4px 9px; font-size: 0.74rem; }
+.btn-block { width: 100%; }
+
+label {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--color-ink-soft);
+}
+input, select, textarea {
+  width: 100%;
+  margin-top: 5px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-paper-soft);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--color-bank-green); }
+
+/* ---------------- Cards / deed-card language ---------------- */
+.card {
+  background: var(--color-paper-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+}
+
+.deed-card {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-paper-raised);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.deed-card .deed-band { height: 10px; }
+
+/* ---------------- Auth screen ---------------- */
+.auth-wrap {
+  max-width: 420px;
+  margin: 6vh auto;
+}
+.auth-tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+.auth-tab {
+  flex: 1; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--color-border);
+  background: var(--color-paper-soft); cursor: pointer; font-weight: 600; color: var(--color-ink-soft);
+}
+.auth-tab.active { background: var(--color-bank-green); color: #fff; border-color: var(--color-bank-green); }
+.auth-form { display: none; }
+.auth-form.active { display: block; }
+.token-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+.token-swatch {
+  width: 100%; aspect-ratio: 1; border-radius: 50%; cursor: pointer; border: 3px solid transparent;
+}
+.token-swatch.selected { border-color: var(--color-ink); }
+
+/* ---------------- Main menu ---------------- */
+.menu-hero { text-align: center; margin: 10px 0 28px; }
+.menu-hero h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); }
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.menu-card {
+  cursor: pointer;
+  text-align: left;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.menu-card .menu-icon {
+  width: 42px; height: 42px; border-radius: 10px;
+  display: grid; place-items: center; font-size: 1.3rem;
+  background: var(--color-paper-soft);
+  border: 1px solid var(--color-border);
+  margin-bottom: 4px;
+}
+.menu-card h3 { margin-bottom: 2px; font-size: 1.05rem; }
+.menu-card p { font-size: 0.85rem; margin: 0; }
+
+/* ---------------- Create game wizard ---------------- */
+.wizard-steps { display: flex; gap: 8px; margin-bottom: 22px; }
+.wizard-step {
+  flex: 1; text-align: center; padding: 8px; border-radius: var(--radius-sm);
+  background: var(--color-paper-soft); border: 1px solid var(--color-border);
+  font-size: 0.8rem; font-weight: 600; color: var(--color-ink-soft);
+}
+.wizard-step.active { background: var(--color-gold-soft); border-color: var(--color-gold); color: var(--color-ink); }
+.wizard-step.done { background: var(--color-bank-green); color: #fff; border-color: var(--color-bank-green); }
+
+.roster-list { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+.roster-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  background: var(--color-paper-soft);
+}
+.roster-row .token-dot { flex-shrink: 0; }
+.roster-row .roster-name { font-weight: 600; flex: 1; }
+.roster-row .roster-meta { font-size: 0.78rem; color: var(--color-ink-soft); }
+.roster-row button { margin-left: auto; }
+
+.picker-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.picker-chip {
+  padding: 7px 12px; border-radius: 999px; border: 1px solid var(--color-border);
+  background: var(--color-paper-soft); cursor: pointer; font-size: 0.85rem;
+}
+.picker-chip.selected { background: var(--color-bank-green); color: #fff; border-color: var(--color-bank-green); }
+
+/* ---------------- Game screen ---------------- */
+.game-header {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  margin-bottom: 16px;
+}
+.header-left { display: flex; align-items: center; gap: 10px; }
+#game-round-badge {
+  font-family: var(--font-mono); font-weight: 600; font-size: 0.95rem;
+  background: var(--color-ink); color: var(--color-paper);
+  padding: 6px 14px; border-radius: 999px;
+}
+#game-role-badge {
+  font-size: 0.78rem; padding: 5px 12px; border-radius: 999px;
+  border: 1px solid var(--color-border); color: var(--color-ink-soft);
+}
+#game-role-badge.badge-banker { background: var(--color-gold-soft); border-color: var(--color-gold); color: var(--color-ink); }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.alert {
+  padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.88rem; margin-bottom: 16px;
+}
+.alert-warning { background: var(--color-gold-soft); color: #4a3a06; }
+[data-theme="dark"] .alert-warning { color: var(--color-ink); }
+.alert-danger { background: var(--color-brick-soft); color: var(--color-brick); }
+
+#winner-banner {
+  background: linear-gradient(120deg, var(--color-gold-soft), var(--color-paper-soft));
+  border: 1px solid var(--color-gold);
+  padding: 14px 18px; border-radius: var(--radius-md); margin-bottom: 16px;
+  font-size: 0.95rem;
+}
+
+.game-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.turn-order-panel {
+  background: var(--color-paper-raised); border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow-card);
+  position: sticky; top: 80px;
+}
+.turn-order-panel h3 { font-size: 0.95rem; margin-bottom: 10px; }
+.turn-order-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.turn-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  border-radius: var(--radius-sm); font-size: 0.85rem;
+}
+.turn-item.current { background: var(--color-bank-green); color: #fff; font-weight: 600; }
+.turn-item.bankrupt { opacity: 0.5; text-decoration: line-through; }
+.turn-name { flex: 1; }
+.mini-stamp {
+  font-size: 0.62rem; font-weight: 700; color: var(--color-brick);
+  border: 1px solid var(--color-brick); padding: 1px 5px; border-radius: 4px;
+}
+
+.token-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; border: 2px solid rgba(255,255,255,0.6); }
+.token-dot.lg { width: 24px; height: 24px; }
+
+.game-tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.tab-btn {
+  padding: 9px 16px; border-radius: 999px; border: 1px solid var(--color-border);
+  background: var(--color-paper-soft); cursor: pointer; font-weight: 600; font-size: 0.85rem; color: var(--color-ink-soft);
+}
+.tab-btn.active { background: var(--color-ink); color: var(--color-paper); border-color: var(--color-ink); }
+
+#game-tab-content { min-height: 200px; }
+
+/* ---- stat cards ---- */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.stat-card {
+  background: var(--color-paper-raised); border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; box-shadow: var(--shadow-card);
+}
+.stat-label { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-ink-soft); }
+.stat-value { font-family: var(--font-mono); font-size: 1.35rem; font-weight: 600; }
+.quick-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+
+/* ---- player cards ---- */
+.player-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.player-card {
+  position: relative; background: var(--color-paper-raised); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); padding: 16px; box-shadow: var(--shadow-card); overflow: hidden;
+}
+.player-card.is-bankrupt { border-color: var(--color-brick); background: var(--color-brick-soft); }
+.bankrupt-seal {
+  position: absolute; top: 14px; right: -34px; transform: rotate(35deg);
+  background: var(--color-brick); color: #fff; font-weight: 700; font-size: 0.72rem;
+  padding: 4px 40px; letter-spacing: 0.08em; box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+.player-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.player-name { font-weight: 700; }
+.player-username { font-size: 0.76rem; color: var(--color-ink-soft); }
+.player-card-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.player-card-stats div { display: flex; flex-direction: column; gap: 2px; font-size: 0.78rem; color: var(--color-ink-soft); }
+.player-card-stats strong { font-family: var(--font-mono); color: var(--color-ink); font-size: 0.95rem; }
+.player-card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.loan-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; padding: 6px 0; border-top: 1px solid var(--color-border); }
+
+/* ---- properties ---- */
+.property-group { margin-bottom: 18px; }
+.property-group h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink-soft); margin-bottom: 8px; }
+.property-tile-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.property-tile {
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm); overflow: hidden;
+  background: var(--color-paper-raised); box-shadow: var(--shadow-card); position: relative;
+  padding-top: 10px;
+}
+.property-tile::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 8px;
+}
+.property-tile.group-brown::before { background: var(--group-brown); }
+.property-tile.group-lightblue::before { background: var(--group-lightblue); }
+.property-tile.group-pink::before { background: var(--group-pink); }
+.property-tile.group-orange::before { background: var(--group-orange); }
+.property-tile.group-red::before { background: var(--group-red); }
+.property-tile.group-yellow::before { background: var(--group-yellow); }
+.property-tile.group-green::before { background: var(--group-green); }
+.property-tile.group-darkblue::before { background: var(--group-darkblue); }
+.property-tile.group-railroad::before { background: var(--group-railroad); }
+.property-tile.group-utility::before { background: var(--group-utility); }
+.property-tile.mortgaged { opacity: 0.65; }
+.property-name { font-weight: 700; font-size: 0.84rem; padding: 8px 10px 0; }
+.property-price { font-family: var(--font-mono); font-size: 0.8rem; padding: 2px 10px; color: var(--color-ink-soft); }
+.property-owner { font-size: 0.74rem; padding: 4px 10px; color: var(--color-ink-soft); }
+.property-mortgage { font-size: 0.7rem; padding: 0 10px 6px; color: var(--color-brick); }
+.property-actions { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 10px 10px; }
+
+/* ---- transactions table ---- */
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.data-table th, .data-table td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--color-border); }
+.data-table th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink-soft); }
+.data-table td:nth-child(5) { font-family: var(--font-mono); }
+
+/* ---------------- Leaderboard ---------------- */
+.leaderboard-controls { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+
+/* ---------------- Saved / previous games lists ---------------- */
+.game-list { display: flex; flex-direction: column; gap: 10px; }
+.game-list-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  padding: 14px 16px; border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  background: var(--color-paper-raised); box-shadow: var(--shadow-card);
+}
+.game-list-row .meta { font-size: 0.8rem; color: var(--color-ink-soft); }
+
+/* ---------------- Calculator ---------------- */
+.fab {
+  position: fixed; bottom: 22px; right: 22px; width: 52px; height: 52px; border-radius: 50%;
+  background: var(--color-ink); color: var(--color-paper); border: none; font-size: 1.3rem; cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.3); z-index: 30;
+}
+.calculator-panel {
+  position: fixed; bottom: 86px; right: 22px; width: 260px;
+  background: var(--color-paper-raised); border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card); padding: 14px; z-index: 30;
+  display: none; flex-direction: column; gap: 10px;
+}
+.calculator-panel.open { display: flex; }
+#calc-display {
+  background: var(--color-ink); color: var(--color-paper); font-family: var(--font-mono);
+  font-size: 1.4rem; text-align: right; padding: 10px 12px; border-radius: var(--radius-sm);
+}
+.calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.calc-grid button {
+  padding: 10px 0; border-radius: var(--radius-sm); border: 1px solid var(--color-border);
+  background: var(--color-paper-soft); cursor: pointer; font-family: var(--font-mono); font-weight: 600;
+}
+.calc-grid button.op { background: var(--color-bank-green); color: #fff; border-color: var(--color-bank-green); }
+.calculator-panel hr { border: none; border-top: 1px solid var(--color-border); margin: 4px 0; }
+#calc-mortgage-form label { font-size: 0.74rem; margin-bottom: 6px; }
+#calc-mortgage-result { font-size: 0.78rem; margin-top: 6px; color: var(--color-bank-green); }
+
+/* ---------------- Modal ---------------- */
+#modal-overlay {
+  position: fixed; inset: 0; background: rgba(15, 20, 18, 0.55);
+  display: none; align-items: center; justify-content: center; z-index: 50; padding: 16px;
+}
+#modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--color-paper-raised); border-radius: var(--radius-lg); padding: 22px;
+  width: 100%; max-width: 420px; box-shadow: var(--shadow-card); max-height: 86vh; overflow-y: auto;
+}
+.modal-box-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.modal-box-head button { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--color-ink-soft); }
+
+/* ---------------- Toast ---------------- */
+#toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px);
+  background: var(--color-ink); color: var(--color-paper); padding: 11px 20px; border-radius: 999px;
+  font-size: 0.86rem; opacity: 0; pointer-events: none; transition: all 0.25s ease; z-index: 60;
+}
+#toast.visible { opacity: 1; transform: translate(-50%, 0); }
+#toast[data-variant="error"] { background: var(--color-brick); }
+
+/* ---------------- Misc ---------------- */
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--color-ink-soft); }
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 820px) {
+  .game-layout { grid-template-columns: 1fr; }
+  .turn-order-panel { position: static; }
+  main#screens { padding: 16px; }
+  .calculator-panel { right: 10px; left: 10px; width: auto; }
+  .fab { right: 16px; bottom: 16px; }
+}
+/* css/styles.css
+   Design language: a banker's ledger crossed with Monopoly deed cards.
+   Tokens below are the single source of truth for color & type — every
+   component derives from these instead of hardcoding values.
+*/
+
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap");
+
+:root {
+  /* ---- Light theme (default) ---- */
+  --color-paper: #f3edde;
+  --color-paper-soft: #faf6ec;
+  --color-paper-raised: #ffffff;
+  --color-ink: #1c2b28;
+  --color-ink-soft: #51635c;
+  --color-bank-green: #0b6e4f;
+  --color-bank-green-dark: #084f39;
+  --color-gold: #b8861f;
+  --color-gold-soft: #e9d8a8;
+  --color-brick: #a73327;
+  --color-brick-soft: #f3d9d3;
+  --color-rail: #3b4a6b;
+  --color-border: #d8cba0;
+  --shadow-card: 0 1px 2px rgba(28, 43, 40, 0.06), 0 6px 16px rgba(28, 43, 40, 0.07);
+
+  --group-brown: #8a5634;
+  --group-lightblue: #a8def0;
+  --group-pink: #d93a96;
+  --group-orange: #f7941d;
+  --group-red: #ed1b24;
+  --group-yellow: #f4d100;
+  --group-green: #1fb25a;
+  --group-darkblue: #0072bb;
+  --group-railroad: #2b2b2b;
+  --group-utility: #9a9a9a;
+
+  --font-display: "Fraunces", Georgia, serif;
+  --font-body: "Inter", -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+}
+
+[data-theme="dark"] {
+  --color-paper: #141d1a;
+  --color-paper-soft: #1b2622;
+  --color-paper-raised: #1f2b26;
+  --color-ink: #ede6d2;
+  --color-ink-soft: #aab6ad;
+  --color-bank-green: #34b07e;
+  --color-bank-green-dark: #2b8f67;
+  --color-gold: #d9b753;
+  --color-gold-soft: #4a4023;
+  --color-brick: #e07165;
+  --color-brick-soft: #3c2422;
+  --color-rail: #8da0c9;
+  --color-border: #364039;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; margin: 0 0 0.4em; letter-spacing: -0.01em; }
+p { margin: 0 0 0.75em; color: var(--color-ink-soft); line-height: 1.5; }
+button { font-family: inherit; }
+a { color: var(--color-bank-green); }
+:focus-visible { outline: 2px solid var(--color-gold); outline-offset: 2px; }
+.muted { color: var(--color-ink-soft); font-size: 0.9rem; }
+
+/* ---------------- App shell ---------------- */
+#app {
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 22px;
+  background: var(--color-paper-raised);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.25rem;
+}
+.brand-mark {
+  width: 34px; height: 34px;
+  border-radius: 8px;
+  background: linear-gradient(155deg, var(--color-bank-green), var(--color-bank-green-dark));
+  display: grid; place-items: center;
+  color: var(--color-gold-soft);
+  font-family: var(--font-display);
+  font-weight: 700;
+  box-shadow: var(--shadow-card);
+}
+.topbar-actions { display: flex; align-items: center; gap: 10px; }
+
+.theme-toggle {
+  border: 1px solid var(--color-border);
+  background: var(--color-paper-soft);
+  color: var(--color-ink);
+  border-radius: 999px;
+  width: 38px; height: 38px;
+  cursor: pointer;
+  font-size: 1rem;
+}
+
+.user-chip {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.88rem;
+  padding: 6px 10px;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background: var(--color-paper-soft);
+}
+.user-chip button {
+  border: none; background: none; color: var(--color-brick);
+  cursor: pointer; font-weight: 600; font-size: 0.82rem;
+}
+
+main#screens { flex: 1; padding: 24px; max-width: 1180px; margin: 0 auto; width: 100%; }
+
+.screen { display: none; animation: fadeIn 0.25s ease; }
+.screen.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px);} to { opacity: 1; transform: none; } }
+
+/* ---------------- Buttons & forms ---------------- */
+.btn {
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.92rem;
+  padding: 10px 18px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-bank-green);
+  background: var(--color-bank-green);
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.12s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+}
+.btn:hover { box-shadow: 0 4px 14px rgba(11, 110, 79, 0.28); transform: translateY(-1px); }
+.btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-outline { background: transparent; color: var(--color-bank-green); }
+.btn-ghost { background: transparent; color: var(--color-ink); border-color: var(--color-border); }
+.btn-danger { background: var(--color-brick); border-color: var(--color-brick); }
+.btn-gold { background: var(--color-gold); border-color: var(--color-gold); color: #2b2208; }
+.btn-sm { padding: 6px 12px; font-size: 0.8rem; }
+.btn-xs { padding: 4px 9px; font-size: 0.74rem; }
+.btn-block { width: 100%; }
+
+label {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: var(--color-ink-soft);
+}
+input, select, textarea {
+  width: 100%;
+  margin-top: 5px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border);
+  background: var(--color-paper-soft);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--color-bank-green); }
+
+/* ---------------- Cards / deed-card language ---------------- */
+.card {
+  background: var(--color-paper-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 20px;
+}
+
+.deed-card {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-paper-raised);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+.deed-card .deed-band { height: 10px; }
+
+/* ---------------- Auth screen ---------------- */
+.auth-wrap {
+  max-width: 420px;
+  margin: 6vh auto;
+}
+.auth-tabs { display: flex; gap: 6px; margin-bottom: 18px; }
+.auth-tab {
+  flex: 1; padding: 10px; border-radius: var(--radius-sm); border: 1px solid var(--color-border);
+  background: var(--color-paper-soft); cursor: pointer; font-weight: 600; color: var(--color-ink-soft);
+}
+.auth-tab.active { background: var(--color-bank-green); color: #fff; border-color: var(--color-bank-green); }
+.auth-form { display: none; }
+.auth-form.active { display: block; }
+.token-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 16px; }
+.token-swatch {
+  width: 100%; aspect-ratio: 1; border-radius: 50%; cursor: pointer; border: 3px solid transparent;
+}
+.token-swatch.selected { border-color: var(--color-ink); }
+
+/* ---------------- Main menu ---------------- */
+.menu-hero { text-align: center; margin: 10px 0 28px; }
+.menu-hero h1 { font-size: clamp(1.7rem, 4vw, 2.4rem); }
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.menu-card {
+  cursor: pointer;
+  text-align: left;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.menu-card .menu-icon {
+  width: 42px; height: 42px; border-radius: 10px;
+  display: grid; place-items: center; font-size: 1.3rem;
+  background: var(--color-paper-soft);
+  border: 1px solid var(--color-border);
+  margin-bottom: 4px;
+}
+.menu-card h3 { margin-bottom: 2px; font-size: 1.05rem; }
+.menu-card p { font-size: 0.85rem; margin: 0; }
+
+/* ---------------- Create game wizard ---------------- */
+.wizard-steps { display: flex; gap: 8px; margin-bottom: 22px; }
+.wizard-step {
+  flex: 1; text-align: center; padding: 8px; border-radius: var(--radius-sm);
+  background: var(--color-paper-soft); border: 1px solid var(--color-border);
+  font-size: 0.8rem; font-weight: 600; color: var(--color-ink-soft);
+}
+.wizard-step.active { background: var(--color-gold-soft); border-color: var(--color-gold); color: var(--color-ink); }
+.wizard-step.done { background: var(--color-bank-green); color: #fff; border-color: var(--color-bank-green); }
+
+.roster-list { display: flex; flex-direction: column; gap: 10px; margin: 16px 0; }
+.roster-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border: 1px solid var(--color-border); border-radius: var(--radius-sm);
+  background: var(--color-paper-soft);
+}
+.roster-row .token-dot { flex-shrink: 0; }
+.roster-row .roster-name { font-weight: 600; flex: 1; }
+.roster-row .roster-meta { font-size: 0.78rem; color: var(--color-ink-soft); }
+.roster-row button { margin-left: auto; }
+
+.picker-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.picker-chip {
+  padding: 7px 12px; border-radius: 999px; border: 1px solid var(--color-border);
+  background: var(--color-paper-soft); cursor: pointer; font-size: 0.85rem;
+}
+.picker-chip.selected { background: var(--color-bank-green); color: #fff; border-color: var(--color-bank-green); }
+
+/* ---------------- Game screen ---------------- */
+.game-header {
+  display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+  margin-bottom: 16px;
+}
+.header-left { display: flex; align-items: center; gap: 10px; }
+#game-round-badge {
+  font-family: var(--font-mono); font-weight: 600; font-size: 0.95rem;
+  background: var(--color-ink); color: var(--color-paper);
+  padding: 6px 14px; border-radius: 999px;
+}
+#game-role-badge {
+  font-size: 0.78rem; padding: 5px 12px; border-radius: 999px;
+  border: 1px solid var(--color-border); color: var(--color-ink-soft);
+}
+#game-role-badge.badge-banker { background: var(--color-gold-soft); border-color: var(--color-gold); color: var(--color-ink); }
+.header-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+.alert {
+  padding: 12px 16px; border-radius: var(--radius-sm); font-size: 0.88rem; margin-bottom: 16px;
+}
+.alert-warning { background: var(--color-gold-soft); color: #4a3a06; }
+[data-theme="dark"] .alert-warning { color: var(--color-ink); }
+.alert-danger { background: var(--color-brick-soft); color: var(--color-brick); }
+
+#winner-banner {
+  background: linear-gradient(120deg, var(--color-gold-soft), var(--color-paper-soft));
+  border: 1px solid var(--color-gold);
+  padding: 14px 18px; border-radius: var(--radius-md); margin-bottom: 16px;
+  font-size: 0.95rem;
+}
+
+.game-layout {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.turn-order-panel {
+  background: var(--color-paper-raised); border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg); padding: 16px; box-shadow: var(--shadow-card);
+  position: sticky; top: 80px;
+}
+.turn-order-panel h3 { font-size: 0.95rem; margin-bottom: 10px; }
+.turn-order-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.turn-item {
+  display: flex; align-items: center; gap: 8px; padding: 8px 10px;
+  border-radius: var(--radius-sm); font-size: 0.85rem;
+}
+.turn-item.current { background: var(--color-bank-green); color: #fff; font-weight: 600; }
+.turn-item.bankrupt { opacity: 0.5; text-decoration: line-through; }
+.turn-name { flex: 1; }
+.mini-stamp {
+  font-size: 0.62rem; font-weight: 700; color: var(--color-brick);
+  border: 1px solid var(--color-brick); padding: 1px 5px; border-radius: 4px;
+}
+
+.token-dot { width: 14px; height: 14px; border-radius: 50%; display: inline-block; border: 2px solid rgba(255,255,255,0.6); }
+.token-dot.lg { width: 24px; height: 24px; }
+
+.game-tabs { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+.tab-btn {
+  padding: 9px 16px; border-radius: 999px; border: 1px solid var(--color-border);
+  background: var(--color-paper-soft); cursor: pointer; font-weight: 600; font-size: 0.85rem; color: var(--color-ink-soft);
+}
+.tab-btn.active { background: var(--color-ink); color: var(--color-paper); border-color: var(--color-ink); }
+
+#game-tab-content { min-height: 200px; }
+
+/* ---- stat cards ---- */
+.card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 16px; }
+.stat-card {
+  background: var(--color-paper-raised); border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  padding: 14px 16px; display: flex; flex-direction: column; gap: 4px; box-shadow: var(--shadow-card);
+}
+.stat-label { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--color-ink-soft); }
+.stat-value { font-family: var(--font-mono); font-size: 1.35rem; font-weight: 600; }
+.quick-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 6px; }
+
+/* ---- player cards ---- */
+.player-card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.player-card {
+  position: relative; background: var(--color-paper-raised); border: 1px solid var(--color-border);
+  border-radius: var(--radius-md); padding: 16px; box-shadow: var(--shadow-card); overflow: hidden;
+}
+.player-card.is-bankrupt { border-color: var(--color-brick); background: var(--color-brick-soft); }
+.bankrupt-seal {
+  position: absolute; top: 14px; right: -34px; transform: rotate(35deg);
+  background: var(--color-brick); color: #fff; font-weight: 700; font-size: 0.72rem;
+  padding: 4px 40px; letter-spacing: 0.08em; box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+.player-card-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.player-name { font-weight: 700; }
+.player-username { font-size: 0.76rem; color: var(--color-ink-soft); }
+.player-card-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+.player-card-stats div { display: flex; flex-direction: column; gap: 2px; font-size: 0.78rem; color: var(--color-ink-soft); }
+.player-card-stats strong { font-family: var(--font-mono); color: var(--color-ink); font-size: 0.95rem; }
+.player-card-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.loan-row { display: flex; align-items: center; justify-content: space-between; font-size: 0.85rem; padding: 6px 0; border-top: 1px solid var(--color-border); }
+
+/* ---- properties ---- */
+.property-group { margin-bottom: 18px; }
+.property-group h4 { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink-soft); margin-bottom: 8px; }
+.property-tile-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+.property-tile {
+  border: 1px solid var(--color-border); border-radius: var(--radius-sm); overflow: hidden;
+  background: var(--color-paper-raised); box-shadow: var(--shadow-card); position: relative;
+  padding-top: 10px;
+}
+.property-tile::before {
+  content: ""; position: absolute; top: 0; left: 0; right: 0; height: 8px;
+}
+.property-tile.group-brown::before { background: var(--group-brown); }
+.property-tile.group-lightblue::before { background: var(--group-lightblue); }
+.property-tile.group-pink::before { background: var(--group-pink); }
+.property-tile.group-orange::before { background: var(--group-orange); }
+.property-tile.group-red::before { background: var(--group-red); }
+.property-tile.group-yellow::before { background: var(--group-yellow); }
+.property-tile.group-green::before { background: var(--group-green); }
+.property-tile.group-darkblue::before { background: var(--group-darkblue); }
+.property-tile.group-railroad::before { background: var(--group-railroad); }
+.property-tile.group-utility::before { background: var(--group-utility); }
+.property-tile.mortgaged { opacity: 0.65; }
+.property-name { font-weight: 700; font-size: 0.84rem; padding: 8px 10px 0; }
+.property-price { font-family: var(--font-mono); font-size: 0.8rem; padding: 2px 10px; color: var(--color-ink-soft); }
+.property-owner { font-size: 0.74rem; padding: 4px 10px; color: var(--color-ink-soft); }
+.property-mortgage { font-size: 0.7rem; padding: 0 10px 6px; color: var(--color-brick); }
+.property-actions { display: flex; flex-wrap: wrap; gap: 4px; padding: 8px 10px 10px; }
+
+/* ---- transactions table ---- */
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
+.data-table th, .data-table td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--color-border); }
+.data-table th { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink-soft); }
+.data-table td:nth-child(5) { font-family: var(--font-mono); }
+
+/* ---------------- Leaderboard ---------------- */
+.leaderboard-controls { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+
+/* ---------------- Saved / previous games lists ---------------- */
+.game-list { display: flex; flex-direction: column; gap: 10px; }
+.game-list-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  padding: 14px 16px; border: 1px solid var(--color-border); border-radius: var(--radius-md);
+  background: var(--color-paper-raised); box-shadow: var(--shadow-card);
+}
+.game-list-row .meta { font-size: 0.8rem; color: var(--color-ink-soft); }
+
+/* ---------------- Calculator ---------------- */
+.fab {
+  position: fixed; bottom: 22px; right: 22px; width: 52px; height: 52px; border-radius: 50%;
+  background: var(--color-ink); color: var(--color-paper); border: none; font-size: 1.3rem; cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.3); z-index: 30;
+}
+.calculator-panel {
+  position: fixed; bottom: 86px; right: 22px; width: 260px;
+  background: var(--color-paper-raised); border: 1px solid var(--color-border); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card); padding: 14px; z-index: 30;
+  display: none; flex-direction: column; gap: 10px;
+}
+.calculator-panel.open { display: flex; }
+#calc-display {
+  background: var(--color-ink); color: var(--color-paper); font-family: var(--font-mono);
+  font-size: 1.4rem; text-align: right; padding: 10px 12px; border-radius: var(--radius-sm);
+}
+.calc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.calc-grid button {
+  padding: 10px 0; border-radius: var(--radius-sm); border: 1px solid var(--color-border);
+  background: var(--color-paper-soft); cursor: pointer; font-family: var(--font-mono); font-weight: 600;
+}
+.calc-grid button.op { background: var(--color-bank-green); color: #fff; border-color: var(--color-bank-green); }
+.calculator-panel hr { border: none; border-top: 1px solid var(--color-border); margin: 4px 0; }
+#calc-mortgage-form label { font-size: 0.74rem; margin-bottom: 6px; }
+#calc-mortgage-result { font-size: 0.78rem; margin-top: 6px; color: var(--color-bank-green); }
+
+/* ---------------- Modal ---------------- */
+#modal-overlay {
+  position: fixed; inset: 0; background: rgba(15, 20, 18, 0.55);
+  display: none; align-items: center; justify-content: center; z-index: 50; padding: 16px;
+}
+#modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--color-paper-raised); border-radius: var(--radius-lg); padding: 22px;
+  width: 100%; max-width: 420px; box-shadow: var(--shadow-card); max-height: 86vh; overflow-y: auto;
+}
+.modal-box-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.modal-box-head button { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--color-ink-soft); }
+
+/* ---------------- Toast ---------------- */
+#toast {
+  position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px);
+  background: var(--color-ink); color: var(--color-paper); padding: 11px 20px; border-radius: 999px;
+  font-size: 0.86rem; opacity: 0; pointer-events: none; transition: all 0.25s ease; z-index: 60;
+}
+#toast.visible { opacity: 1; transform: translate(-50%, 0); }
+#toast[data-variant="error"] { background: var(--color-brick); }
+
+/* ---------------- Misc ---------------- */
+.section-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; flex-wrap: wrap; gap: 10px; }
+.empty-state { text-align: center; padding: 40px 20px; color: var(--color-ink-soft); }
+
+/* ---------------- Responsive ---------------- */
+@media (max-width: 820px) {
+  .game-layout { grid-template-columns: 1fr; }
+  .turn-order-panel { position: static; }
+  main#screens { padding: 16px; }
+  .calculator-panel { right: 10px; left: 10px; width: auto; }
+  .fab { right: 16px; bottom: 16px; }
+}
