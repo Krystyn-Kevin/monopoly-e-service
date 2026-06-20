@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Monopoly Banker</title>
+<link rel="stylesheet" href="css/styles.css" />
+</head>
+<body data-theme="light">
+<div id="app">
+
+  <header class="app-topbar">
+    <div class="brand"><span class="brand-mark">M</span> Monopoly Banker</div>
+    <div class="topbar-actions">
+      <button class="theme-toggle" id="theme-toggle" title="Toggle dark mode">🌙</button>
+      <div class="user-chip" id="user-chip" hidden>
+        <span id="user-chip-name"></span>
+        <button id="btn-logout">Log out</button>
+      </div>
+    </div>
+  </header>
+
+  <main id="screens">
+
+    <!-- ===================== AUTH ===================== -->
+    <section id="screen-auth" class="screen active">
+      <div class="auth-wrap card">
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-auth-tab="login">Log In</button>
+          <button class="auth-tab" data-auth-tab="signup">Create Profile</button>
+        </div>
+
+        <form id="login-form" class="auth-form active">
+          <label>Username<input type="text" name="username" required autocomplete="username" /></label>
+          <label>Password<input type="password" name="password" required autocomplete="current-password" /></label>
+          <button class="btn btn-block" type="submit">Log In</button>
+        </form>
+
+        <form id="signup-form" class="auth-form">
+          <label>Player Name<input type="text" name="name" required /></label>
+          <label>Username<input type="text" name="username" required /></label>
+          <label>Password<input type="password" name="password" minlength="6" required /></label>
+          <label>Token Color</label>
+          <div class="token-picker" id="signup-token-picker"></div>
+          <button class="btn btn-block" type="submit">Create Profile &amp; Log In</button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ===================== MAIN MENU ===================== -->
+    <section id="screen-main-menu" class="screen">
+      <div class="menu-hero">
+        <h1>Welcome back<span id="welcome-name"></span></h1>
+        <p>Run the bank, track every deed, never lose count of a round again.</p>
+      </div>
+      <div class="menu-grid">
+        <div class="card menu-card" data-nav="screen-create-game">
+          <div class="menu-icon">🎲</div>
+          <h3>Create New Game</h3>
+          <p>Pick players, choose a banker, deal out starting cash.</p>
+        </div>
+        <div class="card menu-card" id="menu-continue">
+          <div class="menu-icon">▶️</div>
+          <h3>Continue Saved Game</h3>
+          <p>Jump back into a game already in progress.</p>
+        </div>
+        <div class="card menu-card" id="menu-previous">
+          <div class="menu-icon">📜</div>
+          <h3>Previous Games</h3>
+          <p>Review completed games and their winners.</p>
+        </div>
+        <div class="card menu-card" id="menu-leaderboard">
+          <div class="menu-icon">🏆</div>
+          <h3>Leaderboard</h3>
+          <p>Lifetime wins, losses, and bankruptcies.</p>
+        </div>
+        <div class="card menu-card" id="menu-player-mgmt">
+          <div class="menu-icon">👥</div>
+          <h3>Player Management</h3>
+          <p>Manage the reusable list of registered players.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CREATE GAME ===================== -->
+    <section id="screen-create-game" class="screen">
+      <div class="section-head">
+        <h2>Create New Game</h2>
+        <button class="btn btn-ghost" data-nav="screen-main-menu">← Main Menu</button>
+      </div>
+      <div class="wizard-steps">
+        <div class="wizard-step" data-step="1">1. Player Count &amp; Banker</div>
+        <div class="wizard-step" data-step="2">2. Player Registration</div>
+        <div class="wizard-step" data-step="3">3. Review &amp; Start</div>
+      </div>
+
+      <div class="card" id="wizard-step-1">
+        <label>Number of Players (2–8)
+          <input type="number" id="setup-player-count" min="2" max="8" value="4" />
+        </label>
+        <button class="btn" id="btn-wizard-1-next">Next: Add Players</button>
+      </div>
+
+      <div class="card" id="wizard-step-2" style="display:none;">
+        <h3>Previously Registered Players</h3>
+        <p class="muted">Tap to add someone you've played with before.</p>
+        <div class="picker-list" id="reusable-player-picker"></div>
+
+        <h3>Register a New Player</h3>
+        <form id="new-player-form">
+          <label>Player Name<input type="text" name="name" required /></label>
+          <label>Username<input type="text" name="username" required /></label>
+          <label>Password<input type="password" name="password" minlength="6" required /></label>
+          <label>Token Color</label>
+          <div class="token-picker" id="new-player-token-picker"></div>
+          <button class="btn" type="submit">Add to Game</button>
+        </form>
+
+        <h3 style="margin-top:18px;">Players In This Game</h3>
+        <div class="roster-list" id="setup-roster-list"></div>
+
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button class="btn btn-ghost" id="btn-wizard-2-back">Back</button>
+          <button class="btn" id="btn-wizard-2-next">Next: Review</button>
+        </div>
+      </div>
+
+      <div class="card" id="wizard-step-3" style="display:none;">
+        <h3>Choose the Banker</h3>
+        <div class="picker-list" id="banker-picker"></div>
+        <div style="display:flex; gap:8px; margin-top:14px;">
+          <button class="btn btn-ghost" id="btn-wizard-3-back">Back</button>
+          <button class="btn btn-gold" id="btn-start-game">Start Game</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== GAME ===================== -->
+    <section id="screen-game" class="screen">
+      <div id="winner-banner" hidden></div>
+      <div class="game-header">
+        <div class="header-left">
+          <span id="game-round-badge">Round 1</span>
+          <span id="game-role-badge">Player view</span>
+        </div>
+        <div class="header-actions">
+          <button class="btn btn-ghost" id="btn-next-turn">Dice Passed →</button>
+          <button class="btn btn-outline" id="btn-next-round">Next Round</button>
+          <button class="btn btn-ghost" id="btn-save-game">💾 Save</button>
+          <button class="btn btn-ghost" id="btn-leave-game">← Menu</button>
+        </div>
+      </div>
+
+      <div class="game-layout">
+        <aside class="turn-order-panel" id="turn-order-panel"></aside>
+        <div class="game-main">
+          <nav class="game-tabs" id="game-tabs"></nav>
+          <div id="game-tab-content"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== SAVED GAMES ===================== -->
+    <section id="screen-saved-games" class="screen">
+      <div class="section-head">
+        <h2>Continue Saved Game</h2>
+        <button class="btn btn-ghost" data-nav="screen-main-menu">← Main Menu</button>
+      </div>
+      <div class="game-list" id="saved-games-list"></div>
+    </section>
+
+    <!-- ===================== PREVIOUS GAMES ===================== -->
+    <section id="screen-previous-games" class="screen">
+      <div class="section-head">
+        <h2>Previous Games</h2>
+        <button class="btn btn-ghost" data-nav="screen-main-menu">← Main Menu</button>
+      </div>
+      <div class="game-list" id="previous-games-list"></div>
+    </section>
+
+    <!-- ===================== LEADERBOARD ===================== -->
+    <section id="screen-leaderboard" class="screen">
+      <div class="section-head">
+        <h2>Leaderboard</h2>
+        <button class="btn btn-ghost" data-nav="screen-main-menu">← Main Menu</button>
+      </div>
+      <div class="leaderboard-controls" id="leaderboard-sort-controls"></div>
+      <div style="overflow-x:auto;"><table class="data-table" id="leaderboard-table"></table></div>
+    </section>
+
+    <!-- ===================== PLAYER MANAGEMENT ===================== -->
+    <section id="screen-player-management" class="screen">
+      <div class="section-head">
+        <h2>Player Management</h2>
+        <button class="btn btn-ghost" data-nav="screen-main-menu">← Main Menu</button>
+      </div>
+      <p class="muted">Removing a player only hides them from the picker when setting up new games — their game history is never deleted.</p>
+      <div class="roster-list" id="player-management-list"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ===================== MODAL ===================== -->
+<div id="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-box-head">
+      <h3 id="modal-title">Title</h3>
+      <button id="modal-close" type="button">✕</button>
+    </div>
+    <form id="modal-form">
+      <div id="modal-body"></div>
+      <button class="btn btn-block" id="modal-submit" type="submit">Confirm</button>
+    </form>
+  </div>
+</div>
+
+<!-- ===================== CALCULATOR ===================== -->
+<button class="fab" id="calc-toggle" title="Banker calculator">🧮</button>
+<div class="calculator-panel" id="calculator-panel">
+  <div id="calc-display">0</div>
+  <div class="calc-grid">
+    <button data-calc="C">C</button><button data-calc="%">%</button><button data-calc="/" class="op">÷</button><button data-calc="*" class="op">×</button>
+    <button data-calc="7">7</button><button data-calc="8">8</button><button data-calc="9">9</button><button data-calc="-" class="op">−</button>
+    <button data-calc="4">4</button><button data-calc="5">5</button><button data-calc="6">6</button><button data-calc="+" class="op">+</button>
+    <button data-calc="1">1</button><button data-calc="2">2</button><button data-calc="3">3</button><button data-calc="=" class="op" style="grid-row: span 2;">=</button>
+    <button data-calc="0" style="grid-column: span 2;">0</button><button data-calc=".">.</button>
+  </div>
+  <hr />
+  <form id="calc-mortgage-form">
+    <label>Mortgage principal<input type="number" id="calc-mortgage-principal" min="0" /></label>
+    <label>Mortgage rounds elapsed<input type="number" id="calc-mortgage-rounds" min="0" /></label>
+    <button class="btn btn-sm btn-block" type="submit">Calculate Payoff</button>
+    <div id="calc-mortgage-result"></div>
+  </form>
+</div>
+
+<div id="toast"></div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+rules_version = '2';
+
+// Security model (read this before deploying — also explained in README.md):
+//
+// 1. `players/{uid}` (global, reusable profiles) are readable AND writable by
+//    any signed-in user. This is intentional: the banker needs to register
+//    teammates' accounts from one device during game setup (see the
+//    secondary-app trick in js/auth.js), and the leaderboard needs to read
+//    everyone's lifetime stats. There's no in-app way to edit someone else's
+//    profile maliciously beyond the picker UI, but if you deploy this beyond
+//    a trusted group of friends, tighten this with Cloud Functions.
+//
+// 2. Inside a game, ownership of money is strict: only the assigned Banker
+//    (games/{gameId}.bankerUid) can ever update player balances, properties,
+//    or write transactions. Every participant (playerUids) can read them.
+//    True field-level privacy (hiding OTHER players' balances from a Player
+//    role) would require splitting each player doc into a public "roster"
+//    doc and a private "wallet" doc — straightforward to add later, called
+//    out as a known simplification in README.md. For now privacy is
+//    enforced in the UI (js/gameScreen.js only renders your own balance
+//    unless you're the Banker), not at the database layer.
+//
+// 3. `create` on the players/properties subcollections is intentionally
+//    open to any signed-in user, NOT restricted to the banker, because the
+//    initial game-setup batch (js/gameSetup.js) writes the game doc and its
+//    subcollections together, and rules can't reliably read a parent doc
+//    that's being created in the same batch. All *subsequent* writes
+//    (balance changes, ownership changes) are locked to the banker.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // ---------------- Global player profiles ----------------
+    match /players/{uid} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if false;
+    }
+
+    // ---------------- Games ----------------
+    match /games/{gameId} {
+      allow read: if isSignedIn() && request.auth.uid in resource.data.playerUids;
+      allow create: if isSignedIn()
+                    && request.auth.uid in request.resource.data.playerUids
+                    && request.auth.uid == request.resource.data.bankerUid;
+      // Only the banker advances rounds, saves, or ends the game.
+      allow update: if isSignedIn() && request.auth.uid == resource.data.bankerUid;
+      allow delete: if false;
+
+      match /players/{uid} {
+        function gameDoc() {
+          return get(/databases/$(database)/documents/games/$(gameId)).data;
+        }
+        allow read: if isSignedIn() && request.auth.uid in gameDoc().playerUids;
+        allow create: if isSignedIn(); // initial setup batch — see note 3 above
+        allow update: if isSignedIn() && request.auth.uid == gameDoc().bankerUid;
+        allow delete: if false;
+      }
+
+      match /properties/{propId} {
+        function gameDoc() {
+          return get(/databases/$(database)/documents/games/$(gameId)).data;
+        }
+        allow read: if isSignedIn() && request.auth.uid in gameDoc().playerUids;
+        allow create: if isSignedIn(); // initial setup batch — see note 3 above
+        allow update: if isSignedIn() && request.auth.uid == gameDoc().bankerUid;
+        allow delete: if false;
+      }
+
+      match /transactions/{txId} {
+        function gameDoc() {
+          return get(/databases/$(database)/documents/games/$(gameId)).data;
+        }
+        allow read: if isSignedIn() && request.auth.uid in gameDoc().playerUids;
+        allow create: if isSignedIn() && request.auth.uid == gameDoc().bankerUid;
+        allow update: if false;
+        allow delete: if false;
+      }
+    }
+  }
+}
