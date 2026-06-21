@@ -36,7 +36,7 @@ export const BOARD_PROPERTIES = [
   { id: "new-delhi", name: "New Delhi", group: "darkblue", price: 350 },
   { id: "mumbai", name: "Mumbai", group: "darkblue", price: 400 },
   // Railways
-  { id: "chennai-central", name: "CHennai Central Railway Station", group: "railways", price: 200 },
+  { id: "chennai-central", name: "Chennai Central Railway Station", group: "railways", price: 200 },
   { id: "howrah-rs", name: "Howrah Railways Station", group: "railways", price: 200 },
   { id: "new-del-rs", name: "New Delhi Railway Station", group: "railways", price: 200 },
   { id: "chhat-shiv-term", name: "Chhatrapati Shivaji Terminus", group: "railways", price: 200 },
