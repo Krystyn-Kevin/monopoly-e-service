@@ -19,7 +19,7 @@ export const BOARD_PROPERTIES = [
     // Pink
   { id: "ludhiana", name: "Ludhiana", group: "pink", price: 140 },
   { id: "patna", name: "Patna", group: "pink", price: 140 },
-  { id: "bhopal", name: "bhopal", group: "pink", price: 160 },
+  { id: "bhopal", name: "Bhopal", group: "pink", price: 160 },
   // Orange
   { id: "indore", name: "Indore", group: "orange", price: 180 },
   { id: "nagpur", name: "Nagpur", group: "orange", price: 180 },
