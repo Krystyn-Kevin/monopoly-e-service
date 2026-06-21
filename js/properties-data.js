@@ -1,45 +1,41 @@
 // js/properties-data.js
-// Standard US-edition Monopoly board. Used to preload the `properties`
+// Standard IN-edition Monopoly board. 
 // subcollection of every new game. mortgageValue is the classic half-price
 // baseline; once a property is actually mortgaged, mortgages.js tracks its
 // own compounding value separately (see PRD mortgage rules).
 
 export const BOARD_PROPERTIES = [
   // Brown
-  { id: "mediterranean-ave", name: "Mediterranean Avenue", group: "brown", price: 60 },
-  { id: "baltic-ave", name: "Baltic Avenue", group: "brown", price: 60 },
+  { id: "guwahati", name: "Guwahati", group: "brown", price: 60 },
+  { id: "bhubaneshwar", name: "Bhubaneshwar", group: "brown", price: 60 },
   // Light Blue
-  { id: "oriental-ave", name: "Oriental Avenue", group: "lightblue", price: 100 },
-  { id: "vermont-ave", name: "Vermont Avenue", group: "lightblue", price: 100 },
-  { id: "connecticut-ave", name: "Connecticut Avenue", group: "lightblue", price: 120 },
-  // Pink
-  { id: "st-charles-pl", name: "St. Charles Place", group: "pink", price: 140 },
-  { id: "states-ave", name: "States Avenue", group: "pink", price: 140 },
-  { id: "virginia-ave", name: "Virginia Avenue", group: "pink", price: 160 },
-  // Orange
-  { id: "st-james-pl", name: "St. James Place", group: "orange", price: 180 },
-  { id: "tennessee-ave", name: "Tennessee Avenue", group: "orange", price: 180 },
-  { id: "new-york-ave", name: "New York Avenue", group: "orange", price: 200 },
+  { id: "agra", name: "Agra", group: "lightblue", price: 100 },
+  { id: "panaji", name: "Panaji", group: "lightblue", price: 100 },
+  { id: "vadodara", name: "Vadodara", group: "lightblue", price: 120 },
   // Red
-  { id: "kentucky-ave", name: "Kentucky Avenue", group: "red", price: 220 },
-  { id: "indiana-ave", name: "Indiana Avenue", group: "red", price: 220 },
-  { id: "illinois-ave", name: "Illinois Avenue", group: "red", price: 240 },
+  { id: "lucknow", name: "Lucknow", group: "red", price: 140 },
+  { id: "chandigarh", name: "Chandigarh", group: "red", price: 140 },
+  { id: "jaipur", name: "Jaipur", group: "red", price: 160 },
+  // Orange
+  { id: "indore", name: "Indore", group: "orange", price: 180 },
+  { id: "nagpur", name: "Nagpur", group: "orange", price: 180 },
+  { id: "kochi", name: "Kochi", group: "orange", price: 200 },
   // Yellow
-  { id: "atlantic-ave", name: "Atlantic Avenue", group: "yellow", price: 260 },
-  { id: "ventnor-ave", name: "Ventnor Avenue", group: "yellow", price: 260 },
-  { id: "marvin-gardens", name: "Marvin Gardens", group: "yellow", price: 280 },
+  { id: "pune", name: "Pune", group: "yellow", price: 260 },
+  { id: "hyderabad", name: "Hyderabad", group: "yellow", price: 260 },
+  { id: "ahmedabad", name: "Ahmedabad", group: "yellow", price: 280 },
   // Green
-  { id: "pacific-ave", name: "Pacific Avenue", group: "green", price: 300 },
-  { id: "north-carolina-ave", name: "North Carolina Avenue", group: "green", price: 300 },
-  { id: "pennsylvania-ave", name: "Pennsylvania Avenue", group: "green", price: 320 },
+  { id: "kolkata", name: "Kolkata", group: "green", price: 300 },
+  { id: "chennai", name: "Chennai", group: "green", price: 300 },
+  { id: "bengaluru", name: "Bengaluru", group: "green", price: 320 },
   // Dark Blue
-  { id: "park-place", name: "Park Place", group: "darkblue", price: 350 },
-  { id: "boardwalk", name: "Boardwalk", group: "darkblue", price: 400 },
-  // Railroads
-  { id: "reading-railroad", name: "Reading Railroad", group: "railroad", price: 200 },
-  { id: "pennsylvania-railroad", name: "Pennsylvania Railroad", group: "railroad", price: 200 },
-  { id: "bo-railroad", name: "B. & O. Railroad", group: "railroad", price: 200 },
-  { id: "short-line", name: "Short Line", group: "railroad", price: 200 },
+  { id: "new-delhi", name: "New Delhi", group: "darkblue", price: 350 },
+  { id: "mumbai", name: "Mumbai", group: "darkblue", price: 400 },
+  // Railways
+  { id: "chennai-central", name: "CHennai Central Railway Station", group: "railways", price: 200 },
+  { id: "howrah-rs", name: "Howrah Railways Station", group: "railways", price: 200 },
+  { id: "new-del-rs", name: "New Delhi Railway Station", group: "railways", price: 200 },
+  { id: "chhat-shiv-term", name: "Chhatrapati Shivaji Terminus", group: "railways", price: 200 },
   // Utilities
   { id: "electric-company", name: "Electric Company", group: "utility", price: 150 },
   { id: "water-works", name: "Water Works", group: "utility", price: 150 },
@@ -48,13 +44,12 @@ export const BOARD_PROPERTIES = [
 export const GROUP_LABELS = {
   brown: "Brown",
   lightblue: "Light Blue",
-  pink: "Pink",
   orange: "Orange",
   red: "Red",
   yellow: "Yellow",
   green: "Green",
   darkblue: "Dark Blue",
-  railroad: "Railroad",
+  railways: "Railways",
   utility: "Utility",
 };
 
