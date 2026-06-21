@@ -13,9 +13,13 @@ export const BOARD_PROPERTIES = [
   { id: "panaji", name: "Panaji", group: "lightblue", price: 100 },
   { id: "vadodara", name: "Vadodara", group: "lightblue", price: 120 },
   // Red
-  { id: "lucknow", name: "Lucknow", group: "red", price: 140 },
-  { id: "chandigarh", name: "Chandigarh", group: "red", price: 140 },
-  { id: "jaipur", name: "Jaipur", group: "red", price: 160 },
+  { id: "lucknow", name: "Lucknow", group: "red", price: 220 },
+  { id: "chandigarh", name: "Chandigarh", group: "red", price: 220 },
+  { id: "jaipur", name: "Jaipur", group: "red", price: 240 },
+    // Pink
+  { id: "ludhiana", name: "Ludhiana", group: "pink", price: 140 },
+  { id: "patna", name: "Patna", group: "pink", price: 140 },
+  { id: "bhopal", name: "bhopal", group: "pink", price: 160 },
   // Orange
   { id: "indore", name: "Indore", group: "orange", price: 180 },
   { id: "nagpur", name: "Nagpur", group: "orange", price: 180 },
@@ -46,6 +50,7 @@ export const GROUP_LABELS = {
   lightblue: "Light Blue",
   orange: "Orange",
   red: "Red",
+  pink: "Pink",
   yellow: "Yellow",
   green: "Green",
   darkblue: "Dark Blue",
