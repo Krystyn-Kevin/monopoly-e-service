@@ -1,5 +1,6 @@
 // js/firebase-config.js
 // Firebase initialization for the Monopoly Banker app.
+//
 // IMPORTANT: Two values below (storageBucket, messagingSenderId, appId) are
 // best-guess placeholders derived from the apiKey/authDomain you provided.
 // Auth + Firestore (the two services this app actually uses) only require
@@ -15,11 +16,7 @@ import {
   setPersistence,
   browserLocalPersistence,
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
-import {
-  initializeFirestore,
-  persistentLocalCache,
-  persistentMultipleTabManager,
-} from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBGbN7aRNYnGjiZU7HfWv6o9JuSzB6mEJ8",
@@ -41,11 +38,4 @@ setPersistence(auth, browserLocalPersistence).catch((err) =>
   console.warn("Auth persistence could not be set:", err)
 );
 
-// Firestore with offline persistence enabled so the banker dashboard keeps
-// working (queued writes) through brief connectivity drops, and supports
-// multiple open tabs.
-export const db = initializeFirestore(app, {
-  localCache: persistentLocalCache({
-    tabManager: persistentMultipleTabManager(),
-  }),
-});
+export const db = getFirestore(app);
